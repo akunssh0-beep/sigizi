@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator Gizi - Puskesmas Sampanahan</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body{
+background:linear-gradient(135deg,#1abc9c,#16a085);
+min-height:100vh;
+padding:0;
+display:flex;
+justify-content:center;
+align-items:flex-start;
+}
+
+/* STICKY HEADER */
+.header-locked {
+position: sticky;
+top: 0;
+z-index: 1000;
+background: rgba(255, 255, 255, 0.95);
+backdrop-filter: blur(10px);
+padding: 15px;
+text-align: center;
+box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+border-bottom: 3px solid #16a085;
+width: 100%;
+max-width: 520px;
+animation: slideDown 0.5s ease;
+display: flex;
+justify-content: center;
+align-items: center;
+position: relative;
+}
+
+.header-locked .nav-btn {
+position: absolute;
+background: #16a085;
+color: white;
+width: 32px;
+height: 32px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+font-weight: bold;
+cursor: pointer;
+box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+transition: 0.3s;
+border: none;
+}
+
+.header-locked .info-btn { right: 15px; }
+.header-locked .log-btn { right: 55px; font-size: 16px; }
+
+.header-locked .nav-btn:hover { transform: scale(1.1); background: #0f766e; }
+
+.header-locked h1 { font-size: 18px; color: #16a085; text-transform: uppercase; }
+.header-locked p { font-size: 11px; font-weight: bold; color: #666; }
+
+.container{
+width:100%;
+max-width:520px;
+background:white;
+border-radius:0 0 25px 25px;
+padding:25px;
+box-shadow:0 15px 40px rgba(0,0,0,0.15);
+animation:fadeIn 0.7s ease;
+margin-bottom: 40px;
+}
+
+label{ font-weight:600; display:block; margin-top:15px; margin-bottom:5px; color:#333; font-size: 14px; }
+input,select{ width:100%; padding:12px; border-radius:12px; border:1px solid #ccc; outline:none; font-size:15px; transition:0.3s; background: #fdfdfd; }
+input:focus,select:focus{ border-color:#16a085; box-shadow:0 0 8px rgba(22,160,133,0.2); }
+
+button{ width:100%; padding:14px; margin-top:10px; border:none; border-radius:15px; font-size:15px; font-weight:bold; cursor:pointer; transition:0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn{ background:#16a085; color:white; margin-top: 20px;}
+.btn-reset{ background:#e74c3c; color:white; }
+.btn-new-patient{ background:#64748b; color:white; margin-top: 0; }
+.btn-back-edit{ background:#f39c12; color:white; margin-top: 0; }
+.btn-share{ background:#25d366; color:white; }
+.btn-image{ background:#16a085; color:white; }
+.btn-print{ background:#3498db; color:white; }
+
+.loading{ text-align:center; margin-top:15px; display:none; color:#16a085; font-weight:bold; }
+
+/* HASIL ANALISIS */
+#capture-area { background: white; padding: 25px; border: 1px solid #ddd; border-radius: 4px; margin-top: 20px; color: black; }
+.result-title { text-align: center; font-size: 14px; text-decoration: underline; margin-bottom: 20px; text-transform: uppercase; font-weight: bold; }
+.result-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dotted #ccc; font-size: 13px; }
+
+/* BOX SARAN */
+.saran-box {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f0fdfa;
+    border: 1px solid #16a085;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #0f766e;
+    line-height: 1.5;
+}
+.saran-box b { color: #115e59; display: block; margin-bottom: 5px; text-transform: uppercase; }
+
+/* MODAL OVERLAY */
+.modal-overlay {
+    display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px); justify-content: center; align-items: center; padding: 20px;
+}
+.modal-content {
+    background: white; width: 100%; max-width: 450px; padding: 25px; border-radius: 20px; text-align: left;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    max-height: 85vh; overflow-y: auto;
+}
+
+/* MODAL KONFIRMASI RESET */
+.confirm-reset-box {
+    text-align: center;
+}
+.confirm-reset-box .icon {
+    font-size: 50px;
+    margin-bottom: 15px;
+    display: block;
+}
+
+/* RIWAYAT LOG */
+.log-item { border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
+.log-item:last-child { border: none; }
+.log-info { font-size: 12px; }
+.log-info b { color: #16a085; }
+.log-time { font-size: 10px; color: #999; }
+.btn-del-log { background: #fee2e2; color: #ef4444; padding: 5px 10px; border-radius: 8px; font-size: 10px; width: auto; margin: 0; }
+
+@keyframes fadeIn{ from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+@keyframes slideDown{ from{transform:translateY(-100%);} to{transform:translateY(0);} }
+@keyframes popIn {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@media print { .no-print { display: none !important; } body { background: white; } .container { box-shadow: none; border: none; width: 100%; max-width: 100%; } #capture-area { border: none; padding: 0; } }
+</style>
+
+    <meta name="theme-color" content="#16a085">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json?v=1777259645134">
+    <link rel="apple-touch-icon" href="icon-192.png">
+</head>
+
+<body>
+
+<div id="infoModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3 style="color: #16a085;">Panduan Aplikasi</h3>
+        <p style="margin-top:10px; font-size:13px; line-height:1.6;">Aplikasi digitalisasi Puskesmas Sampanahan Hilir untuk skrining gizi mandiri dan cepat.</p>
+        <button class="btn" onclick="closeInfoModal()">Saya Mengerti</button>
+    </div>
+</div>
+
+<div id="logModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3 style="color: #16a085; margin-bottom: 15px;">Riwayat Hari Ini (24 Jam)</h3>
+        <div id="log-list"></div>
+        <button class="btn-reset" onclick="closeLogModal()" style="margin-top: 20px;">Tutup</button>
+    </div>
+</div>
+
+<div id="confirmResetModal" class="modal-overlay">
+    <div class="modal-content confirm-reset-box">
+        <span class="icon"></span>
+        <h3 style="color: #e74c3c; margin-bottom: 10px;">Bersihkan Form?</h3>
+        <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Semua data pasien yang sedang diinput akan dihapus secara permanen dari layar ini.</p>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-new-patient" onclick="closeResetModal()" style="margin:0; flex:1; background:#ccc;">Batal</button>
+            <button class="btn-reset" onclick="executeResetForm()" style="margin:0; flex:1;">Ya, Bersihkan</button>
+        </div>
+    </div>
+</div>
+
+<div id="waModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3 style="color: #16a085;">Bagikan Hasil</h3>
+        <label>Nomor WhatsApp</label>
+        <input type="number" id="waNumber" placeholder="Contoh: 08123456xxx">
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button class="btn-reset" onclick="closeWaModal()" style="margin:0;">Batal</button>
+            <button class="btn-share" onclick="sendToWhatsApp()" style="margin:0; flex:1;">Kirim</button>
+        </div>
+    </div>
+</div>
+
+<div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+    
+    <div class="header-locked">
+        <div style="flex: 1;">
+            <h1> Kalkulator Gizi Pro</h1>
+            <p>UPTD PUSKESMAS SAMPANAHAN</p>
+        </div>
+        <button class="nav-btn log-btn" onclick="openLogModal()"></button>
+        <button class="nav-btn info-btn" onclick="openInfoModal()">?</button>
+    </div>
+
+    <div class="container">
+        <div id="form-pasien" class="no-print">
+            <label>Nama Pasien</label>
+            <input type="text" id="nama" oninput="saveLocal()" placeholder="Masukkan nama pasien">
+
+            <label>Jenis Kelamin</label>
+            <select id="gender" onchange="saveLocal()">
+                <option value="male">Laki-laki</option>
+                <option value="female">Perempuan</option>
+            </select>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div><label>Umur (thn)</label><input type="number" id="age" min="0" oninput="saveLocal()" placeholder="Tahun"></div>
+                <div><label>Bulan</label><input type="number" id="month" min="0" max="11" oninput="saveLocal()" placeholder="Bulan"></div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div><label>Berat (kg)</label><input type="number" id="weight" min="0" oninput="saveLocal()"></div>
+                <div><label>Tinggi (cm)</label><input type="number" id="height" min="0" oninput="saveLocal()"></div>
+            </div>
+
+            <label>Aktivitas Fisik</label>
+            <select id="activity" onchange="saveLocal()">
+                <option value="1.2">Sedentari (Banyak duduk)</option>
+                <option value="1.375">Ringan (Aktivitas sedikit)</option>
+                <option value="1.55">Sedang (Bergerak aktif)</option>
+                <option value="1.725">Berat (Fisik tinggi)</option>
+            </select>
+
+            <label>Kondisi Khusus</label>
+            <select id="condition" onchange="saveLocal()">
+                <option value="Normal">Normal</option>
+                <option value="DM">DM (Diabetes)</option>
+                <option value="Hipertensi">Hipertensi</option>
+                <option value="Obesitas">Obesitas</option>
+                <option value="Kurus">Kurus</option>
+                <option value="Hamil">Hamil</option>
+            </select>
+
+            <button class="btn" onclick="calculate()"> Hitung Gizi</button>
+            <button class="btn-reset" onclick="triggerResetModal()"> Bersihkan Form</button>
+        </div>
+
+        <div class="loading" id="loading">Memproses data...</div>
+
+        <div id="result-wrapper" style="display: none;">
+            <div class="no-print" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                <button class="btn-new-patient" onclick="backToNewPatient()"> Pasien Baru</button>
+                <button class="btn-back-edit" onclick="backToEdit()"> Kembali / Ubah</button>
+            </div>
+
+            <div id="capture-area">
+                <div class="result-title">Surat Hasil Analisis Gizi</div>
+                <div id="hasil-konten"></div>
+                <div id="saran-konten" class="saran-box"></div>
+                <div style="margin-top: 30px; text-align: left; font-size: 11px;">
+                    <p id="tgl-sekarang" style="text-align: right;"></p>
+                    <p style="margin-top: 10px; color: #888; font-style: italic;">* Lokasi: Sampanahan Hilir. Sistem otomatis digital.</p>
+                </div>
+            </div>
+
+            <div class="no-print" style="margin-top: 20px;">
+                <button class="btn-image" onclick="downloadImage()"> Simpan Gambar (PNG)</button>
+                <button class="btn-share" onclick="openWaModal()"> Bagikan WhatsApp</button>
+                <button class="btn-print" onclick="window.print()"> Cetak Dokumen</button>
+            </div>
+        </div>
+
+        <small style="display:block; text-align:center; margin-top:20px; color:#999; font-size:10px;">
+            Digital Health System • adi.p • copyright@adi.p
+        </small>
+    </div>
+</div>
+
+<script>
+let lastResult = {}; 
+
+window.onload = function() {
+    const saved = localStorage.getItem("gizi_sampanahan_v3");
+    if(saved) {
+        const d = JSON.parse(saved);
+        document.getElementById("nama").value = d.nama || "";
+        document.getElementById("age").value = d.age || "";
+        document.getElementById("month").value = d.month || "";
+        document.getElementById("weight").value = d.weight || "";
+        document.getElementById("height").value = d.height || "";
+        document.getElementById("gender").value = d.gender || "male";
+        document.getElementById("activity").value = d.activity || "1.2";
+        document.getElementById("condition").value = d.condition || "Normal";
+    }
+    cleanOldLogs();
+};
+
+function saveLocal() {
+    const data = {
+        nama: document.getElementById("nama").value,
+        age: document.getElementById("age").value,
+        month: document.getElementById("month").value,
+        weight: document.getElementById("weight").value,
+        height: document.getElementById("height").value,
+        gender: document.getElementById("gender").value,
+        activity: document.getElementById("activity").value,
+        condition: document.getElementById("condition").value
+    };
+    localStorage.setItem("gizi_sampanahan_v3", JSON.stringify(data));
+}
+
+function getSaranOtomatis(status, condition) {
+    let saran = "";
+    if(condition === "DM") saran += "Batasi konsumsi gula murni dan karbohidrat sederhana. ";
+    else if(condition === "Hipertensi") saran += "Kurangi asupan garam dan hindari makanan olahan. ";
+    else if(condition === "Obesitas") saran += "Lakukan defisit kalori dan kurangi gorengan. ";
+    else if(condition === "Hamil") saran += "Pastikan asupan zat besi dan asam folat terpenuhi. ";
+
+    if(status === "Kurus") saran += "Tingkatkan frekuensi makan padat gizi.";
+    else if(status === "Normal") saran += "Pertahankan pola makan gizi seimbang.";
+    else if(status === "Gemuk" || status === "Obesitas") saran += "Rutin aktivitas fisik minimal 30 menit.";
+
+    return saran || "Konsultasikan lebih lanjut dengan petugas gizi.";
+}
+
+function calculate(){
+    let nama = document.getElementById("nama").value;
+    let weight = parseFloat(document.getElementById("weight").value);
+    let height = parseFloat(document.getElementById("height").value);
+    let ageY = parseFloat(document.getElementById("age").value) || 0;
+    let ageM = parseFloat(document.getElementById("month").value) || 0;
+    let gender = document.getElementById("gender").value;
+    let activity = parseFloat(document.getElementById("activity").value);
+    let condition = document.getElementById("condition").value;
+
+    if(!nama || isNaN(weight) || isNaN(height)) return alert("Mohon lengkapi data pasien dengan benar!");
+    
+    // Total umur dalam tahun untuk kalkulasi BMR
+    let totalAge = ageY + (ageM / 12);
+
+    document.getElementById("form-pasien").style.display = "none";
+    document.getElementById("loading").style.display="block";
+    document.getElementById("result-wrapper").style.display="none";
+
+    setTimeout(()=>{
+        let bmi = weight / ((height/100)**2);
+        let status = bmi < 18.5 ? "Kurus" : bmi < 25 ? "Normal" : bmi < 30 ? "Gemuk" : "Obesitas";
+        let bmr = gender=="male" ? 66 + (13.7*weight)+(5*height)-(6.8*totalAge) : 655 + (9.6*weight)+(1.8*height)-(4.7*totalAge);
+        let tee = bmr * activity;
+        let ideal = (height - 100) * 0.9;
+        let protein = weight * 1.2;
+        let cairan = weight * 30;
+
+        const now = new Date();
+        const tgl = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+        document.getElementById("tgl-sekarang").innerText = `Sampanahan Hilir, ${tgl}`;
+
+        let displayUmur = `${ageY} Thn ${ageM > 0 ? ageM + ' Bln' : ''}`;
+
+        document.getElementById("hasil-konten").innerHTML = `
+            <div class="result-row"><b>Nama Pasien:</b> <span>${nama}</span></div>
+            <div class="result-row"><b>Umur:</b> <span>${displayUmur}</span></div>
+            <div class="result-row"><b>Status IMT:</b> <span>${bmi.toFixed(1)} (${status})</span></div>
+            <div class="result-row"><b>Berat Badan Ideal:</b> <span>${ideal.toFixed(1)} kg</span></div>
+            <div class="result-row"><b>Energi:</b> <span>${tee.toFixed(0)} kkal/hari</span></div>
+            <div class="result-row"><b>Protein:</b> <span>${protein.toFixed(0)} gram</span></div>
+            <div class="result-row"><b>Cairan:</b> <span>${cairan.toFixed(0)} ml/hari</span></div>
+        `;
+
+        const saranOtomatis = getSaranOtomatis(status, condition);
+        document.getElementById("saran-konten").innerHTML = `<b>Saran:</b> ${saranOtomatis}`;
+        
+        lastResult = {
+            nama: nama,
+            imt: bmi.toFixed(1),
+            status: status,
+            waktu: now.getTime(),
+            waktuStr: now.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'})
+        };
+
+        document.getElementById("loading").style.display="none";
+        document.getElementById("result-wrapper").style.display="block";
+        saveLocal();
+    }, 800);
+}
+
+function saveToLog() {
+    if(!lastResult.nama) return;
+    let logs = JSON.parse(localStorage.getItem("gizi_logs") || "[]");
+    const isDuplicate = logs.some(l => l.nama === lastResult.nama && l.waktuStr === lastResult.waktuStr);
+    if(!isDuplicate) {
+        logs.unshift(lastResult);
+        localStorage.setItem("gizi_logs", JSON.stringify(logs));
+    }
+}
+
+function cleanOldLogs() {
+    let logs = JSON.parse(localStorage.getItem("gizi_logs") || "[]");
+    const expiry = 24 * 60 * 60 * 1000;
+    const now = new Date().getTime();
+    const freshLogs = logs.filter(log => (now - log.waktu) < expiry);
+    localStorage.setItem("gizi_logs", JSON.stringify(freshLogs));
+}
+
+function openLogModal() {
+    cleanOldLogs();
+    const logs = JSON.parse(localStorage.getItem("gizi_logs") || "[]");
+    const list = document.getElementById("log-list");
+    if(logs.length === 0) {
+        list.innerHTML = "<p style='text-align:center; color:#999; font-size:12px;'>Belum ada riwayat hari ini.</p>";
+    } else {
+        list.innerHTML = logs.map((log, index) => `
+            <div class="log-item">
+                <div class="log-info">
+                    <b>${log.nama}</b> (${log.imt})<br>
+                    <span class="log-time">${log.status} • Jam ${log.waktuStr}</span>
+                </div>
+                <button class="btn-del-log" onclick="deleteSingleLog(${index})">Hapus</button>
+            </div>
+        `).join('');
+    }
+    document.getElementById("logModal").style.display = "flex";
+}
+
+function deleteSingleLog(index) {
+    let logs = JSON.parse(localStorage.getItem("gizi_logs") || "[]");
+    logs.splice(index, 1);
+    localStorage.setItem("gizi_logs", JSON.stringify(logs));
+    openLogModal();
+}
+
+function closeLogModal() { document.getElementById("logModal").style.display = "none"; }
+
+function triggerResetModal() {
+    document.getElementById("confirmResetModal").style.display = "flex";
+}
+
+function closeResetModal() {
+    document.getElementById("confirmResetModal").style.display = "none";
+}
+
+function executeResetForm() {
+    document.querySelectorAll("input").forEach(i => i.value = "");
+    localStorage.removeItem("gizi_sampanahan_v3");
+    closeResetModal();
+    document.getElementById("result-wrapper").style.display = "none";
+    document.getElementById("form-pasien").style.display = "block";
+}
+
+function backToNewPatient() {
+    saveToLog();
+    triggerResetModal();
+}
+
+function backToEdit() {
+    document.getElementById("result-wrapper").style.display = "none";
+    document.getElementById("form-pasien").style.display = "block";
+    window.scrollTo(0,0);
+}
+
+function downloadImage() {
+    const area = document.getElementById('capture-area');
+    const namaFile = document.getElementById('nama').value || 'Pasien';
+    html2canvas(area, { scale: 2, backgroundColor: "#ffffff" }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `Hasil_Gizi_${namaFile}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+    });
+}
+
+function openWaModal() { document.getElementById("waModal").style.display = "flex"; }
+function closeWaModal() { document.getElementById("waModal").style.display = "none"; }
+function openInfoModal() { document.getElementById("infoModal").style.display = "flex"; }
+function closeInfoModal() { document.getElementById("infoModal").style.display = "none"; }
+
+function sendToWhatsApp() {
+    let num = document.getElementById("waNumber").value;
+    if(!num) return alert("Masukkan nomor WhatsApp!");
+    if(num.startsWith("0")) num = "62" + num.slice(1);
+    const hasilText = document.getElementById("hasil-konten").innerText;
+    const saranText = document.getElementById("saran-konten").innerText;
+    const text = `*SURAT HASIL ANALISIS GIZI*\n*UPTD PUSKESMAS SAMPANAHAN*\n\n${hasilText}\n\n${saranText}\n\n_Generated by GiziPro Digitall_`;
+    window.open(`https://wa.me/${num}?text=${encodeURIComponent(text)}`, "_blank");
+}
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js?v=1777259645134').then(reg => {
+        console.log('PWA: ServiceWorker Registered');
+        reg.onupdatefound = () => {
+          const installingWorker = reg.installing;
+          installingWorker.onstatechange = () => {
+            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              window.location.reload();
+            }
+          };
+        };
+      });
+    });
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshing) return;
+      refreshing = true;
+      window.location.reload();
+    });
+  }
+</script>
+</body>
+</html>
