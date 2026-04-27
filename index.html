@@ -320,16 +320,40 @@ function saveLocal() {
     localStorage.setItem("gizi_sampanahan_v3", JSON.stringify(data));
 }
 
-function getSaranOtomatis(status, condition) {
+// Logika TB per Umur Sederhana (Estimasi Pertumbuhan)
+function getStatusTBU(ageTotal, height, gender) {
+    if (ageTotal > 19) return "N/A (Hanya untuk <19 thn)";
+    
+    // Estimasi Tinggi Badan StandarWHO (Rata-rata)
+    // Tinggi lahir ~50cm, +25cm thn 1, +12cm thn 2, +8cm thn 3, dst.
+    // Atau rumus praktis 2-12 thn: (Umur x 7) + 77
+    let expectedHeight = 0;
+    if (ageTotal < 1) expectedHeight = 50 + (ageTotal * 25);
+    else if (ageTotal <= 12) expectedHeight = (ageTotal * 6) + 77;
+    else expectedHeight = (ageTotal * 5) + 85;
+
+    // Koreksi gender
+    if (gender === "female") expectedHeight -= 2;
+
+    let diff = height - expectedHeight;
+    if (diff < -10) return "Sangat Pendek (Stunted)";
+    if (diff < -5) return "Pendek";
+    if (diff > 10) return "Tinggi";
+    return "Normal";
+}
+
+function getSaranOtomatis(status, condition, statusTBU) {
     let saran = "";
     if(condition === "DM") saran += "Batasi konsumsi gula murni dan karbohidrat sederhana. ";
     else if(condition === "Hipertensi") saran += "Kurangi asupan garam dan hindari makanan olahan. ";
     else if(condition === "Obesitas") saran += "Lakukan defisit kalori dan kurangi gorengan. ";
     else if(condition === "Hamil") saran += "Pastikan asupan zat besi dan asam folat terpenuhi. ";
 
-    if(status === "Kurus") saran += "Tingkatkan frekuensi makan padat gizi.";
-    else if(status === "Normal") saran += "Pertahankan pola makan gizi seimbang.";
-    else if(status === "Gemuk" || status === "Obesitas") saran += "Rutin aktivitas fisik minimal 30 menit.";
+    if(status === "Kurus") saran += "Tingkatkan frekuensi makan padat gizi. ";
+    else if(status === "Normal") saran += "Pertahankan pola makan gizi seimbang. ";
+    else if(status === "Gemuk" || status === "Obesitas") saran += "Rutin aktivitas fisik minimal 30 menit. ";
+
+    if(statusTBU.includes("Stunted") || statusTBU === "Pendek") saran += "Perbanyak asupan protein hewani dan kalsium.";
 
     return saran || "Konsultasikan lebih lanjut dengan petugas gizi.";
 }
@@ -346,7 +370,6 @@ function calculate(){
 
     if(!nama || isNaN(weight) || isNaN(height)) return alert("Mohon lengkapi data pasien dengan benar!");
     
-    // Total umur dalam tahun untuk kalkulasi BMR
     let totalAge = ageY + (ageM / 12);
 
     document.getElementById("form-pasien").style.display = "none";
@@ -361,6 +384,11 @@ function calculate(){
         let ideal = (height - 100) * 0.9;
         let protein = weight * 1.2;
         let cairan = weight * 30;
+        let lemak = (0.25 * tee) / 9;
+        let karbohidrat = (tee - (protein * 4) - (lemak * 9)) / 4;
+
+        // Hitung TB/U
+        let statusTBU = getStatusTBU(totalAge, height, gender);
 
         const now = new Date();
         const tgl = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -371,14 +399,18 @@ function calculate(){
         document.getElementById("hasil-konten").innerHTML = `
             <div class="result-row"><b>Nama Pasien:</b> <span>${nama}</span></div>
             <div class="result-row"><b>Umur:</b> <span>${displayUmur}</span></div>
+            <div class="result-row"><b>Tinggi Badan (TB):</b> <span>${height} cm</span></div>
+            <div class="result-row"><b>Status TB/U:</b> <span>${statusTBU}</span></div>
             <div class="result-row"><b>Status IMT:</b> <span>${bmi.toFixed(1)} (${status})</span></div>
             <div class="result-row"><b>Berat Badan Ideal:</b> <span>${ideal.toFixed(1)} kg</span></div>
             <div class="result-row"><b>Energi:</b> <span>${tee.toFixed(0)} kkal/hari</span></div>
             <div class="result-row"><b>Protein:</b> <span>${protein.toFixed(0)} gram</span></div>
+            <div class="result-row"><b>Lemak:</b> <span>${lemak.toFixed(0)} gram</span></div>
+            <div class="result-row"><b>Karbohidrat:</b> <span>${karbohidrat.toFixed(0)} gram</span></div>
             <div class="result-row"><b>Cairan:</b> <span>${cairan.toFixed(0)} ml/hari</span></div>
         `;
 
-        const saranOtomatis = getSaranOtomatis(status, condition);
+        const saranOtomatis = getSaranOtomatis(status, condition, statusTBU);
         document.getElementById("saran-konten").innerHTML = `<b>Saran:</b> ${saranOtomatis}`;
         
         lastResult = {
