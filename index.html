@@ -120,6 +120,28 @@ button{ width:100%; padding:14px; margin-top:10px; border:none; border-radius:15
 }
 .saran-box b { color: #115e59; display: block; margin-bottom: 5px; text-transform: uppercase; }
 
+.hindari-box {
+    margin-top: 10px;
+    padding: 12px;
+    background: #fff1f2;
+    border: 1px solid #fb7185;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #9f1239;
+}
+.hindari-box b { color: #881337; display: block; margin-bottom: 5px; text-transform: uppercase; }
+
+.olahraga-box {
+    margin-top: 10px;
+    padding: 12px;
+    background: #f0f9ff;
+    border: 1px solid #38bdf8;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #075985;
+}
+.olahraga-box b { color: #0c4a6e; display: block; margin-bottom: 5px; text-transform: uppercase; }
+
 .menu-harian-box {
     margin-top: 10px;
     padding: 12px;
@@ -129,89 +151,6 @@ button{ width:100%; padding:14px; margin-top:10px; border:none; border-radius:15
     font-size: 12px;
 }
 .menu-harian-box b { color: #92400e; display: block; margin-bottom: 5px; }
-
-/* CHATBOT FLOATING (DRAGGABLE) */
-#chatbot-launcher {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 60px;
-    height: 60px;
-    background: #16a085;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    font-size: 24px;
-    cursor: move;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    z-index: 3000;
-    user-select: none;
-    touch-action: none;
-}
-
-#chatbot-popup {
-    position: fixed;
-    bottom: 90px;
-    right: 20px;
-    width: 320px;
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    z-index: 2999;
-    display: none;
-    flex-direction: column;
-    overflow: hidden;
-    animation: slideUp 0.4s ease;
-    border: 1px solid #1abc9c;
-}
-
-.chatbot-header {
-    background: #16a085;
-    color: white;
-    padding: 15px;
-    font-weight: bold;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 14px;
-}
-
-.chat-window {
-    background: #fdfdfd;
-    height: 300px;
-    overflow-y: auto;
-    padding: 15px;
-    font-size: 13px;
-}
-
-.chat-msg { margin-bottom: 10px; padding: 8px 12px; border-radius: 12px; max-width: 85%; line-height: 1.4; }
-.bot-msg { background: #e0f2f1; color: #00695c; align-self: flex-start; border-bottom-left-radius: 2px; }
-.user-msg { background: #16a085; color: white; margin-left: auto; border-bottom-right-radius: 2px; text-align: right; }
-
-.chat-input-area {
-    display: flex;
-    padding: 10px;
-    background: #f1f1f1;
-    gap: 5px;
-}
-
-.chat-input-area input {
-    flex: 1;
-    padding: 10px;
-    border-radius: 20px;
-    border: 1px solid #ddd;
-    font-size: 13px;
-}
-
-.chat-input-area button {
-    margin-top: 0;
-    width: 45px;
-    height: 40px;
-    border-radius: 20px;
-    padding: 0;
-}
 
 /* MODAL OVERLAY */
 .modal-overlay {
@@ -234,7 +173,6 @@ button{ width:100%; padding:14px; margin-top:10px; border:none; border-radius:15
 
 @keyframes fadeIn{ from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
 @keyframes slideDown{ from{transform:translateY(-100%);} to{transform:translateY(0);} }
-@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 @keyframes popIn {
     from { opacity: 0; transform: scale(0.8); }
     to { opacity: 1; transform: scale(1); }
@@ -249,22 +187,6 @@ button{ width:100%; padding:14px; margin-top:10px; border:none; border-radius:15
 </head>
 
 <body>
-
-<div id="chatbot-launcher" class="no-print"></div>
-
-<div id="chatbot-popup" class="no-print">
-    <div class="chatbot-header">
-        <span> Chatbot by.adi.p</span>
-        <span onclick="toggleChatbot()" style="cursor:pointer; font-size: 18px;">&times;</span>
-    </div>
-    <div class="chat-window" id="chat-window">
-        <div class="chat-msg bot-msg">Halo! Saya asisten gizi by.adi.p. Ikon saya bisa Anda geser ke mana saja lho! Ada yang bisa saya bantu?</div>
-    </div>
-    <div class="chat-input-area">
-        <input type="text" id="chat-input" placeholder="Tanya gizi..." onkeypress="if(event.key==='Enter') sendChat()">
-        <button class="btn" style="margin:0;" onclick="sendChat()"></button>
-    </div>
-</div>
 
 <div id="infoModal" class="modal-overlay">
     <div class="modal-content">
@@ -309,10 +231,10 @@ button{ width:100%; padding:14px; margin-top:10px; border:none; border-radius:15
     
     <div class="header-locked">
         <div style="flex: 1;">
-            <h1> Kalkulator Gizi Pro</h1>
+            <h1>🥗 Kalkulator Gizi Pro</h1>
             <p>UPTD PUSKESMAS SAMPANAHAN</p>
         </div>
-        <button class="nav-btn log-btn" onclick="openLogModal()"></button>
+        <button class="nav-btn log-btn" onclick="openLogModal()">📋</button>
         <button class="nav-btn info-btn" onclick="openInfoModal()">?</button>
     </div>
 
@@ -360,22 +282,24 @@ button{ width:100%; padding:14px; margin-top:10px; border:none; border-radius:15
                 <option value="Hamil">Hamil</option>
             </select>
 
-            <button class="btn" onclick="calculate()"> Hitung Gizi</button>
-            <button class="btn-reset" onclick="triggerResetModal()"> Bersihkan Form</button>
+            <button class="btn" onclick="calculate()">🚀 Hitung Gizi</button>
+            <button class="btn-reset" onclick="triggerResetModal()">🗑️ Bersihkan Form</button>
         </div>
 
         <div class="loading" id="loading">Memproses analisis mendetail...</div>
 
         <div id="result-wrapper" style="display: none;">
             <div class="no-print" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
-                <button class="btn-new-patient" onclick="backToNewPatient()"> Pasien Baru</button>
-                <button class="btn-back-edit" onclick="backToEdit()"> Kembali / Ubah</button>
+                <button class="btn-new-patient" onclick="backToNewPatient()">🆕 Pasien Baru</button>
+                <button class="btn-back-edit" onclick="backToEdit()">✏️ Kembali / Ubah</button>
             </div>
 
             <div id="capture-area">
                 <div class="result-title">Surat Hasil Analisis Gizi Detil</div>
                 <div id="hasil-konten"></div>
                 <div id="saran-konten" class="saran-box"></div>
+                <div id="hindari-konten" class="hindari-box"></div>
+                <div id="olahraga-konten" class="olahraga-box"></div>
                 <div id="menu-harian-konten" class="menu-harian-box"></div>
                 <div style="margin-top: 30px; text-align: left; font-size: 11px;">
                     <p id="tgl-sekarang" style="text-align: right;"></p>
@@ -384,14 +308,14 @@ button{ width:100%; padding:14px; margin-top:10px; border:none; border-radius:15
             </div>
 
             <div class="no-print" style="margin-top: 20px;">
-                <button class="btn-image" onclick="downloadImage()"> Simpan Gambar (PNG)</button>
-                <button class="btn-share" onclick="openWaModal()"> Bagikan WhatsApp</button>
-                <button class="btn-print" onclick="window.print()"> Cetak Dokumen</button>
+                <button class="btn-image" onclick="downloadImage()">📸 Simpan Gambar (PNG)</button>
+                <button class="btn-share" onclick="openWaModal()">📲 Bagikan WhatsApp</button>
+                <button class="btn-print" onclick="window.print()">🖨️ Cetak Dokumen</button>
             </div>
         </div>
 
         <small style="display:block; text-align:center; margin-top:20px; color:#999; font-size:10px;">
-            Digital Health System � Developed by: Adi.P - it.barokah.net
+            Digital Health System • Developed by: Adi.P - it.barokah.net
         </small>
     </div>
 </div>
@@ -415,7 +339,6 @@ window.onload = function() {
         document.getElementById("condition").value = d.condition || "Normal";
     }
     cleanOldLogs();
-    initDraggable();
 };
 
 function saveLocal() {
@@ -432,91 +355,6 @@ function saveLocal() {
         condition: document.getElementById("condition").value
     };
     localStorage.setItem("gizi_sampanahan_v4", JSON.stringify(data));
-}
-
-// LOGIKA DRAGGABLE UNTUK CHATBOT
-function initDraggable() {
-    const launcher = document.getElementById("chatbot-launcher");
-    let isDragging = false;
-    let currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
-
-    launcher.addEventListener("touchstart", dragStart, {passive: false});
-    launcher.addEventListener("touchend", dragEnd, {passive: false});
-    launcher.addEventListener("touchmove", drag, {passive: false});
-    launcher.addEventListener("mousedown", dragStart);
-    document.addEventListener("mousemove", drag);
-    document.addEventListener("mouseup", dragEnd);
-
-    function dragStart(e) {
-        if (e.type === "touchstart") {
-            initialX = e.touches[0].clientX - xOffset;
-            initialY = e.touches[0].clientY - yOffset;
-        } else {
-            initialX = e.clientX - xOffset;
-            initialY = e.clientY - yOffset;
-        }
-        if (e.target === launcher) isDragging = true;
-    }
-
-    function dragEnd(e) {
-        initialX = currentX;
-        initialY = currentY;
-        isDragging = false;
-        // Jika tidak bergerak signifikan, anggap klik
-        if(!currentX && !currentY) toggleChatbot();
-    }
-
-    function drag(e) {
-        if (isDragging) {
-            e.preventDefault();
-            if (e.type === "touchmove") {
-                currentX = e.touches[0].clientX - initialX;
-                currentY = e.touches[0].clientY - initialY;
-            } else {
-                currentX = e.clientX - initialX;
-                currentY = e.clientY - initialY;
-            }
-            xOffset = currentX;
-            yOffset = currentY;
-            setTranslate(currentX, currentY, launcher);
-            updatePopupPos(currentX, currentY);
-        }
-    }
-
-    function setTranslate(xPos, yPos, el) {
-        el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
-    }
-
-    function updatePopupPos(x, y) {
-        const popup = document.getElementById("chatbot-popup");
-        popup.style.transform = "translate3d(" + x + "px, " + y + "px, 0)";
-    }
-    
-    launcher.onclick = function() {
-        if(!isDragging) toggleChatbot();
-    };
-}
-
-function toggleChatbot() {
-    const popup = document.getElementById("chatbot-popup");
-    popup.style.display = (popup.style.display === "flex") ? "none" : "flex";
-}
-
-function sendChat() {
-    let input = document.getElementById("chat-input");
-    let window = document.getElementById("chat-window");
-    let text = input.value.trim().toLowerCase();
-    if(!text) return;
-    window.innerHTML += `<div class="chat-msg user-msg">${input.value}</div>`;
-    input.value = "";
-    let reply = "Maaf, Chatbot by.adi.p belum mengerti. Coba tanya 'stunting', 'kalori', atau 'lila'.";
-    if(text.includes("stunting")) reply = "Stunting adalah gagal tumbuh. Pastikan Balita makan Protein Hewani (Telur/Ikan) tiap hari.";
-    else if(text.includes("kalori")) reply = "Kebutuhan kalori Anda dihitung berdasarkan jenis kelamin, berat, tinggi, dan aktivitas.";
-    else if(text.includes("lila")) reply = "LiLA > 23.5cm menandakan status gizi Ibu Hamil normal.";
-    setTimeout(() => {
-        window.innerHTML += `<div class="chat-msg bot-msg">${reply}</div>`;
-        window.scrollTop = window.scrollHeight;
-    }, 600);
 }
 
 function getStatusBadge(status) {
@@ -547,7 +385,7 @@ function calculate(){
     let ageY = parseFloat(document.getElementById("age").value) || 0;
     let ageM = parseFloat(document.getElementById("month").value) || 0;
     let gender = document.getElementById("gender").value;
-    let activity = parseFloat(document.getElementById("activity").value);
+    let activityValue = parseFloat(document.getElementById("activity").value);
     let condition = document.getElementById("condition").value;
     let lila = parseFloat(document.getElementById("lila").value) || 0;
     let lp = parseFloat(document.getElementById("lp").value) || 0;
@@ -564,7 +402,7 @@ function calculate(){
         
         // Rumus Harris-Benedict
         let bmr = gender=="male" ? 66 + (13.7*weight)+(5*height)-(6.8*totalAge) : 655 + (9.6*weight)+(1.8*height)-(4.7*totalAge);
-        let tee = bmr * activity;
+        let tee = bmr * activityValue;
         
         // Makronutrien
         let protein = (tee * 0.15) / 4;
@@ -593,9 +431,35 @@ function calculate(){
         
         document.getElementById("saran-konten").innerHTML = `<b>Analisis:</b> ${status === "Normal" ? "Pertahankan pola makan gizi seimbang." : "Atur asupan kalori dan rutin olahraga."} ${statusLP === "Beresiko Obesitas" ? "Waspada penumpukan lemak perut." : ""}`;
         
+        // Logic Makanan yang Dihindari
+        let hindari = "<b>⚠️ Makanan Dihindari:</b>";
+        if (condition === "DM") {
+            hindari += " Gula pasir, sirup, minuman manis, nasi putih berlebih, buah kaleng, madu, dan tepung-tepungan.";
+        } else if (condition === "Hipertensi") {
+            hindari += " Makanan asin (tinggi natrium), ikan asin, kaldu instan/MSG, gorengan, dan makanan kaleng/awetan.";
+        } else if (status === "Obesitas" || status === "Gemuk" || condition === "Obesitas") {
+            hindari += " Gorengan, santan kental, makanan cepat saji (junk food), minuman soda, dan camilan tinggi gula.";
+        } else {
+            hindari += " Batasi konsumsi minuman kemasan, pemanis buatan, dan lemak jenuh yang berlebihan.";
+        }
+        document.getElementById("hindari-konten").innerHTML = hindari;
+
+        // Logic Saran Olahraga
+        let olahraga = "<b>🏃 Saran Olahraga:</b>";
+        if (status === "Obesitas" || condition === "DM") {
+            olahraga += " Jalan santai 30 menit (tiap pagi), Bersepeda, atau Senam Jantung Sehat (3-5x seminggu).";
+        } else if (status === "Kurus" || condition === "Kurus") {
+            olahraga += " Latihan beban ringan (angkat dumbel), Push-up/Sit-up untuk membentuk massa otot, durasi 20-30 menit.";
+        } else if (condition === "Hamil") {
+            olahraga += " Jalan santai, Yoga kehamilan, atau Renang ringan (konsultasikan dengan bidan).";
+        } else {
+            olahraga += " Lari pagi (Jogging), Berenang, atau Bulu tangkis minimal 150 menit dalam seminggu.";
+        }
+        document.getElementById("olahraga-konten").innerHTML = olahraga;
+
         // Auto Menu
-        let menu = `<b> Menu Harian (${tee.toFixed(0)} kkal):</b>`;
-        menu += condition === "DM" ? `<br>� Pagi: Bubur Gandum<br>� Siang: Nasi Merah + Pepes<br>� Malam: Sayur Bening` : `<br>� Pagi: Nasi Uduk + Telur<br>� Siang: Nasi + Ayam Bakar<br>� Malam: Ikan Goreng`;
+        let menu = `<b>🥗 Menu Harian (${tee.toFixed(0)} kkal):</b>`;
+        menu += condition === "DM" ? `<br>• Pagi: Bubur Gandum/Oatmeal<br>• Siang: Nasi Merah + Pepes Ikan + Sayur Hijau<br>• Malam: Ayam Panggang (Tanpa Kulit) + Sayur Bening` : `<br>• Pagi: Nasi Uduk + Telur Rebus<br>• Siang: Nasi + Ayam Bakar + Lalapan<br>• Malam: Ikan Goreng/Bakar + Tumis Sayur`;
         document.getElementById("menu-harian-konten").innerHTML = menu;
 
         lastResult = { nama, imt: bmi.toFixed(1), status, waktu: now.getTime(), waktuStr: now.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) };
@@ -619,13 +483,12 @@ function cleanOldLogs() {
 }
 
 function openLogModal() {
-    document.getElementById("chatbot-popup").style.display = "none";
     cleanOldLogs();
     const logs = JSON.parse(localStorage.getItem("gizi_logs") || "[]");
     const list = document.getElementById("log-list");
     list.innerHTML = logs.length === 0 ? "<p style='text-align:center;'>Belum ada data.</p>" : logs.map((log, index) => `
         <div class="log-item">
-            <div class="log-info"><b>${log.nama}</b> (${log.imt})<br><span class="log-time">${log.status} � ${log.waktuStr}</span></div>
+            <div class="log-info"><b>${log.nama}</b> (${log.imt})<br><span class="log-time">${log.status} • ${log.waktuStr}</span></div>
             <button class="btn-del-log" onclick="deleteSingleLog(${index})">Hapus</button>
         </div>
     `).join('');
