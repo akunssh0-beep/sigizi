@@ -197,6 +197,12 @@ button{ width:100%; padding:14px; margin-top:10px; border:none; border-radius:15
     <meta name="theme-color" content="#16a085">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="manifest.json?v=1777351022745">
+    <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 
 <body>
@@ -445,7 +451,7 @@ function calculate(){
         
         document.getElementById("saran-konten").innerHTML = `<b>Analisis:</b> ${status === "Normal" ? "Pertahankan pola makan gizi seimbang." : "Atur asupan kalori dan rutin olahraga."} ${statusLP === "Beresiko Obesitas" ? "Waspada penumpukan lemak perut." : ""}`;
         
-        // PENJELASAN IMT (NEW INSTRUCTION)
+        // PENJELASAN IMT
         document.getElementById("imt-info-konten").innerHTML = `
             <b>💡 Edukasi Indeks Massa Tubuh (IMT):</b>
             IMT adalah angka yang menjadi penilaian standar untuk menentukan apakah berat badan seseorang tergolong normal, kurang, atau berlebih berdasarkan tinggi badan.<br>
@@ -479,10 +485,29 @@ function calculate(){
         }
         document.getElementById("olahraga-konten").innerHTML = olahraga;
 
-        // Auto Menu
-        let menu = `<b>🥗 Menu Harian (${tee.toFixed(0)} kkal):</b>`;
-        menu += condition === "DM" ? `<br>• Pagi: Bubur Gandum/Oatmeal<br>• Siang: Nasi Merah + Pepes Ikan + Sayur Hijau<br>• Malam: Ayam Panggang (Tanpa Kulit) + Sayur Bening` : `<br>• Pagi: Nasi Uduk + Telur Rebus<br>• Siang: Nasi + Ayam Bakar + Lalapan<br>• Malam: Ikan Goreng/Bakar + Tumis Sayur`;
-        document.getElementById("menu-harian-konten").innerHTML = menu;
+        // NEW AUTO MENU & EXPLANATION
+        let menuTitle = `<b>🥗 Rekomendasi Menu & Penjelasan (${tee.toFixed(0)} kkal):</b>`;
+        let menuDetail = "";
+        let explanation = "";
+
+        if (condition === "DM") {
+            menuDetail = `<br>• Pagi: Oatmeal dengan potongan buah apel.<br>• Siang: Nasi merah (1 porsi sedang) + Ikan pepes + Tempe bacem.<br>• Malam: Dada ayam panggang + Sup bening bayam.`;
+            explanation = `<p style="margin-top:8px; font-style:italic; border-top:1px solid #eee; padding-top:5px; color:#666;"><b>Kenapa menu ini?</b> Nasi merah dan oatmeal mengandung serat tinggi agar gula darah tidak naik mendadak (cepat kenyang, lama lapar).</p>`;
+        } else if (condition === "Hipertensi") {
+            menuDetail = `<br>• Pagi: Pisang rebus + Telur rebus (tanpa garam tambahan).<br>• Siang: Nasi putih + Ayam bakar rempah + Cah brokoli.<br>• Malam: Ikan tim jahe + Sayur bening labu siam.`;
+            explanation = `<p style="margin-top:8px; font-style:italic; border-top:1px solid #eee; padding-top:5px; color:#666;"><b>Kenapa menu ini?</b> Fokus pada makanan segar tanpa pengawet dan rendah garam (natrium) untuk membantu menurunkan tekanan darah.</p>`;
+        } else if (status === "Obesitas" || condition === "Obesitas") {
+            menuDetail = `<br>• Pagi: Roti gandum utuh + Putih telur rebus.<br>• Siang: Nasi (porsi kecil) + Banyak sayuran hijau + Ikan bakar.<br>• Malam: Buah pepaya/melon + Tumis buncis tahu.`;
+            explanation = `<p style="margin-top:8px; font-style:italic; border-top:1px solid #eee; padding-top:5px; color:#666;"><b>Kenapa menu ini?</b> Memperbanyak sayur sebagai volume makanan agar perut tetap terasa penuh namun dengan kalori yang rendah.</p>`;
+        } else if (status === "Kurus") {
+            menuDetail = `<br>• Pagi: Nasi kuning + Telur + Tempe goreng.<br>• Siang: Nasi putih + Ayam goreng + Sayur lodeh + Alpukat.<br>• Malam: Mie rebus telur sayur + Susu full cream.`;
+            explanation = `<p style="margin-top:8px; font-style:italic; border-top:1px solid #eee; padding-top:5px; color:#666;"><b>Kenapa menu ini?</b> Menu ini padat gizi dan kalori untuk membantu menambah berat badan secara bertahap dan sehat.</p>`;
+        } else {
+            menuDetail = `<br>• Pagi: Nasi uduk / Roti telur.<br>• Siang: Nasi + Ayam bakar + Sayur asam + Buah jeruk.<br>• Malam: Ikan goreng + Tumis kangkung.`;
+            explanation = `<p style="margin-top:8px; font-style:italic; border-top:1px solid #eee; padding-top:5px; color:#666;"><b>Kenapa menu ini?</b> Ini adalah pola makan gizi seimbang (Isi Piringku) untuk menjaga metabolisme tubuh tetap stabil.</p>`;
+        }
+
+        document.getElementById("menu-harian-konten").innerHTML = menuTitle + menuDetail + explanation;
 
         lastResult = { nama, imt: bmi.toFixed(1), status, waktu: now.getTime(), waktuStr: now.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) };
         document.getElementById("loading").style.display="none";
@@ -562,5 +587,13 @@ function sendToWhatsApp() {
     window.open(`https://wa.me/${num}?text=${encodeURIComponent(text)}`, "_blank");
 }
 </script>
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js?v=1777351022745');
+        });
+      }
+    </script>
 </body>
 </html>
